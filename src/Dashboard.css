@@ -47,12 +47,35 @@ body {
 .logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 14px;
+    text-decoration: none;
+    color: #fff;
+    background: linear-gradient(90deg, #2563eb 0%, #38bdf8 100%);
+    padding: 0.18rem 1rem 0.18rem 0.5rem;
+    border-radius: 2.5rem;
+    box-shadow: 0 4px 16px rgba(56, 189, 248, 0.10);
+    margin-top: 0.2rem;
 }
 
 .logo-icon {
-    color: var(--primary-color);
-    font-size: 24px;
+    font-size: 2rem;
+    color: #fff !important;
+    background: none;
+    filter: none;
+    transition: transform 0.3s;
+    cursor: pointer;
+}
+
+.logo h1 {
+    font-size: 1.7rem;
+    font-weight: 900;
+    margin: 0;
+    letter-spacing: 1px;
+    color: #fff;
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+    -webkit-text-fill-color: unset;
 }
 
 .menu-toggle {
@@ -366,6 +389,19 @@ body {
 
     .counter-option {
         flex: 1 1 calc(50% - 0.5rem);
+    }
+}
+
+@media (max-width: 600px) {
+    .logo {
+        padding: 0.1rem 0.5rem 0.1rem 0.3rem;
+        gap: 7px;
+    }
+    .logo-icon {
+        font-size: 1.3rem;
+    }
+    .logo h1 {
+        font-size: 1rem;
     }
 }
 

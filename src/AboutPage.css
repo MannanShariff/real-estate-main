@@ -43,16 +43,15 @@
 }
 
 .logo h1 {
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   font-weight: 900;
-  color: #fff;
   margin: 0;
   letter-spacing: 1px;
+  color: #fff;
   background: none;
   -webkit-background-clip: unset;
   background-clip: unset;
   -webkit-text-fill-color: unset;
-  text-fill-color: unset;
 }
 
 .about-content-container {
@@ -72,22 +71,25 @@
 }
 
 .about-image-section {
-  flex: 1 1 350px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 2rem;
+  margin-left: 0;
 }
 
 .about-main-image {
-  width: 320px;
-  height: 320px;
+  width: 340px;
+  height: 240px;
   object-fit: cover;
-  border-radius: 28px;
+  border-radius: 18px;
   box-shadow: 0 8px 32px rgba(24, 182, 201, 0.13);
-  border: 4px solid #e0e7ef;
+  border: 3px solid #e0e7ef;
   background: #f8fafc;
   transition: transform 0.3s, box-shadow 0.3s;
   animation: about-img-float 4s infinite ease-in-out;
+  margin-bottom: 0;
 }
 
 .about-main-image:hover {
@@ -119,7 +121,6 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-fill-color: transparent;
 }
 
 .about-desc {
@@ -147,8 +148,8 @@
     margin-bottom: 1.5rem;
   }
   .about-main-image {
-    width: 220px;
-    height: 220px;
+    width: 260px;
+    height: 180px;
   }
   .about-text-section {
     padding: 0.5rem 0.5rem;

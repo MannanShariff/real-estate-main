@@ -53,7 +53,16 @@ const AboutPage = () => {
       </nav>
       <div className="about-content-container">
         <div className="about-image-section">
-          <img src="/icon1.jpg" alt="About EstateHub" className="about-main-image" />
+          <img 
+            src="/icon1.jpg" 
+            alt="About Us" 
+            className="about-main-image"
+          />
+          <img 
+            src="/icon2.jpg" 
+            alt="About Us" 
+            className="about-main-image"
+          />
         </div>
         <div className="about-text-section">
           <h2 className="about-title">Welcome to EstateHub</h2>

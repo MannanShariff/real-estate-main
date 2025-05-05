@@ -90,15 +90,13 @@ body {
 
 .logo-text {
     font-size: 24px;
-    font-weight: 900;
+    font-weight: 700;
     letter-spacing: -0.5px;
     color: #fff;
-    background: linear-gradient(to right, #38bdf8, #2563eb 80%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: #fff;
-    text-fill-color: #fff;
-    text-shadow: 0 2px 8px rgba(30, 60, 114, 0.18);
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+    -webkit-text-fill-color: unset;
 }
 
 .nav-buttons {
