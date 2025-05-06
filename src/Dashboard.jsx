@@ -34,7 +34,7 @@ const Dashboard = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('currentUser');
-        navigate('/login');
+        navigate('/');
     };
 
     // Popular locations in Bangalore
@@ -73,7 +73,7 @@ const Dashboard = () => {
     };
 
     const menuItems = [
-        { icon: <FaHome />, text: 'Home', action: () => navigate('/') },
+        { icon: <FaHome />, text: 'Home', action: () => navigate('/home') },
         { icon: <FaChartLine />, text: 'Prediction Dashboard', action: () => navigate('/dashboard') },
         { icon: <AiOutlineInfoCircle />, text: 'About', action: () => navigate('/about') },
         { icon: <AiOutlineContacts />, text: 'Contact', action: () => navigate('/contact') },

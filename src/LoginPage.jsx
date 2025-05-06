@@ -57,7 +57,7 @@ const LoginPage = () => {
             });
 
             // Navigate to dashboard
-            navigate('/dashboard');
+            navigate('/home');
         } catch (error) {
             setError('An error occurred. Please try again.');
         } finally {

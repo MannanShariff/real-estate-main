@@ -23,11 +23,11 @@ const ContactPage = () => {
   };
 
   const menuItems = [
-    { icon: <FaHome />, text: 'Home', action: () => navigate('/') },
+    { icon: <FaHome />, text: 'Home', action: () => navigate('/home') },
     { icon: <FaChartLine />, text: 'Prediction Dashboard', action: () => navigate('/dashboard') },
     { icon: <AiOutlineInfoCircle />, text: 'About', action: () => navigate('/about') },
     { icon: <FaRegAddressBook />, text: 'Contact', action: () => navigate('/contact') },
-    { icon: <BiLogOut />, text: 'Logout', action: () => { localStorage.removeItem('currentUser'); navigate('/login'); } },
+    { icon: <BiLogOut />, text: 'Logout', action: () => { localStorage.removeItem('currentUser'); navigate('/'); } },
   ];
 
   return (
@@ -108,14 +108,14 @@ const ContactPage = () => {
                 <FaPhoneAlt />
               </div>
               <h3>PHONE (LANDLINE)</h3>
-              <p>+91 82170 27213<br />+91 88618 39338</p>
+              <p>+91 82170 27213<br />+91 73539 83159</p>
             </div>
             <div className="contact-info-card">
               <div className="contact-info-icon location-icon">
                 <FaMapMarkerAlt />
               </div>
               <h3>OUR OFFICE LOCATION</h3>
-              <p>The real-estate Design EstateHub Company<br />chickbanavar, bengaluru, karnataka.</p>
+              <p>Crest stone properties and builders<br />No 74, Sumeru towers, Brigade road , near St. joseph's college of commerce , Bangalore 560025</p>
             </div>
           </div>
         </div>

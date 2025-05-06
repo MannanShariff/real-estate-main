@@ -8,6 +8,7 @@ import SignupPage from "./SignupPage";
 import Dashboard from "./Dashboard";
 import ContactPage from "./ContactPage";
 import AboutPage from "./AboutPage";
+import HomePage from "./HomePage";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -19,6 +20,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/home" element={<HomePage />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

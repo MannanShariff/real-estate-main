@@ -10,11 +10,11 @@ const AboutPage = () => {
   const navigate = useNavigate();
 
   const menuItems = [
-    { icon: <FaHome />, text: 'Home', action: () => navigate('/') },
+    { icon: <FaHome />, text: 'Home', action: () => navigate('/home') },
     { icon: <FaChartLine />, text: 'Prediction Dashboard', action: () => navigate('/dashboard') },
     { icon: <FaInfoCircle />, text: 'About', action: () => navigate('/about') },
     { icon: <FaRegAddressBook />, text: 'Contact', action: () => navigate('/contact') },
-    { icon: <BiLogOut />, text: 'Logout', action: () => { localStorage.removeItem('currentUser'); navigate('/login'); } },
+    { icon: <BiLogOut />, text: 'Logout', action: () => { localStorage.removeItem('currentUser'); navigate('/'); } },
   ];
 
   return (
