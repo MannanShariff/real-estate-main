@@ -15,13 +15,6 @@ const ContactPage = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3500);
-    setForm({ email: '', name: '' });
-  };
-
   const menuItems = [
     { icon: <FaHome />, text: 'Home', action: () => navigate('/home') },
     { icon: <FaChartLine />, text: 'Prediction Dashboard', action: () => navigate('/dashboard') },
@@ -68,33 +61,27 @@ const ContactPage = () => {
         <div className="contact-container contact-wide">
           <h1 className="contact-title">Contact Us</h1>
           <p className="contact-subtitle">Any questions or remarks? Just write us a message!</p>
-          <form className="contact-form" onSubmit={handleSubmit}>
+          <form
+            className="contact-form"
+            action="https://getform.io/f/adrnekra"
+            method="POST"
+          >
             <div className="contact-inputs">
               <input
                 type="email"
                 name="email"
                 placeholder="Enter a valid email address"
-                value={form.email}
-                onChange={handleChange}
                 required
               />
               <input
                 type="text"
                 name="name"
                 placeholder="Enter your Name"
-                value={form.name}
-                onChange={handleChange}
                 required
               />
             </div>
             <button type="submit" className="contact-submit">SUBMIT</button>
           </form>
-          {submitted && (
-            <div className="contact-success">
-              Thank you! Your message has been sent.
-              <span className="close-success" onClick={() => setSubmitted(false)}>×</span>
-            </div>
-          )}
           <div className="contact-info-cards">
             <div className="contact-info-card">
               <div className="contact-info-icon real-estate-icon">
