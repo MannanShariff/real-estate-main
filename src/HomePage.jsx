@@ -111,7 +111,10 @@ const HomePage = () => {
             </div>
           ))}
         </div>
-        <button className="predict-btn-home" onClick={() => navigate('/dashboard')}>click to predict</button>
+        <div className="button-row-home">
+          <button className="predict-btn-home" onClick={() => navigate('/dashboard')}>click to predict</button>
+          <button className="add-remove-btn-home" onClick={() => navigate('/property-dashboard')}>Add/Remove</button>
+        </div>
       </main>
     </div>
   );

@@ -325,6 +325,37 @@
   background: linear-gradient(135deg, #2a5298, #4ECDC4);
 }
 
+.add-remove-btn-home {
+  width: 260px;
+  padding: 1.1rem;
+  background: linear-gradient(135deg, #4ECDC4, #2a5298);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(42, 82, 152, 0.2);
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  animation: pulse 1.5s infinite;
+}
+.add-remove-btn-home:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 20px rgba(42, 82, 152, 0.3);
+  background: linear-gradient(135deg, #2a5298, #4ECDC4);
+}
+
+.button-row-home {
+  display: flex;
+  gap: 3.5rem;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
 @keyframes fadeInUp {
   0% {
     opacity: 0;
@@ -418,5 +449,15 @@
   }
   .hero-subtitle {
     font-size: 0.9rem;
+  }
+}
+@media (max-width: 600px) {
+  .predict-btn-home, .add-remove-btn-home {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.8rem 0;
+  }
+  .button-row-home {
+    gap: 2rem;
   }
 } 

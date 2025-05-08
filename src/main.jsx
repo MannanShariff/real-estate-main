@@ -9,6 +9,7 @@ import Dashboard from "./Dashboard";
 import ContactPage from "./ContactPage";
 import AboutPage from "./AboutPage";
 import HomePage from "./HomePage";
+import PropertyDashboard from "./PropertyDashboard";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -21,6 +22,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/home" element={<HomePage />} />
+        <Route path="/property-dashboard" element={<PropertyDashboard />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

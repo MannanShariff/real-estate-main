@@ -26,8 +26,7 @@ A modern real estate web application built with React.js, Node.js, and Express.j
 ## 🧑‍💻 Getting Started
 
 1. **Clone the repo:**
-   git clone https://github.com/MannanShariff/real-estate-project.git
-   cd real-estate-project
+   git clone 
 
 2. Install frontend dependencies:
    npm install
