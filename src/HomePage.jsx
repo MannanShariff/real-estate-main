@@ -37,6 +37,18 @@ const propertyData = [
     thought: 'Luxury living in the heart of the city.'
   },
   {
+    icon: '/icon6.jpeg',
+    location: 'Frezer town',
+    price: '₹3.4 Cr',
+    thought: 'Luxury Vila'
+  },
+  {
+    icon: '/icon4.jpeg',
+    location: 'Rajajinagar',
+    price: '₹1.4 Cr',
+    thought: 'Dream house for families.'
+  },
+  {
     icon: '/icon9.jpeg',
     location: 'Electronic City',
     price: '₹95 L',
@@ -99,7 +111,7 @@ const HomePage = () => {
         </div>
         <div className="property-grid">
           {propertyData.map((property, idx) => (
-            <div className="property-card animated-card" key={idx} style={{ animationDelay: `${idx * 0.1 + 0.2}s` }}>
+            <div className="property-card animated-card" key={idx} style={{ animationDelay: `${idx * 0.15 + 0.3}s` }}>
               <div className="property-image-wrapper">
                 <img src={property.icon} alt={property.location} className="property-icon" />
               </div>
@@ -112,12 +124,12 @@ const HomePage = () => {
           ))}
         </div>
         <div className="button-row-home">
-          <button className="predict-btn-home" onClick={() => navigate('/dashboard')}>click to predict</button>
-          <button className="add-remove-btn-home" onClick={() => navigate('/property-dashboard')}>Add/Remove</button>
+          <button className="predict-btn-home" onClick={() => navigate('/Dashboard')}>Click to Predict</button>
+          <button className="add-remove-btn-home" onClick={() => navigate('/')}>Back</button>
         </div>
       </main>
     </div>
   );
 };
 
-export default HomePage; 
+export default HomePage;

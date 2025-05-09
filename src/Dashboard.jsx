@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './Dashboard.css';
 
 // Import icons from react-icons
-import { FaHome, FaMapMarkerAlt, FaRupeeSign, FaChartLine, FaRegBuilding, FaBars, FaTimes } from 'react-icons/fa';
+import { FaHome, FaMapMarkerAlt, FaRupeeSign, FaChartLine, FaRegBuilding, FaBars, FaTimes, FaCheckCircle } from 'react-icons/fa';
 import { BiBed, BiBath } from 'react-icons/bi';
 import { MdTrendingUp, MdCompare } from 'react-icons/md';
 import { TbReportAnalytics } from 'react-icons/tb';
@@ -14,13 +15,22 @@ const Dashboard = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [menuOpen, setMenuOpen] = useState(false);
-
-    // State for form inputs
     const [area, setArea] = useState('');
     const [bhk, setBhk] = useState(2);
     const [bath, setBath] = useState(2);
     const [location, setLocation] = useState('');
     const [predictedPrice, setPredictedPrice] = useState(null);
+    const [propertyFound, setPropertyFound] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isAppointmentBooked, setIsAppointmentBooked] = useState(false);
+
+    // Popular locations in Bangalore, including Frezer Town
+    const popularLocations = [
+        'Whitefield', 'Electronic City', 'Indiranagar',
+        'Koramangala', 'HSR Layout', 'JP Nagar',
+        'Marathahalli', 'Jayanagar', 'Bannerghatta Road',
+        'Frezer Town'
+    ];
 
     useEffect(() => {
         // Check if user is logged in
@@ -34,42 +44,61 @@ const Dashboard = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('currentUser');
+        localStorage.removeItem('dealerToken');
         navigate('/');
     };
 
-    // Popular locations in Bangalore
-    const popularLocations = [
-        'Whitefield', 'Electronic City', 'Indiranagar',
-        'Koramangala', 'HSR Layout', 'JP Nagar',
-        'Marathahalli', 'Jayanagar', 'Bannerghatta Road'
-    ];
-
-    // Handle prediction
-    const handlePrediction = (e) => {
+    const handlePrediction = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
+        setPropertyFound(null);
+        setPredictedPrice(null);
+        setIsAppointmentBooked(false);
 
-        // This would be replaced with an actual API call to a ML model
-        // For now, using a simple formula based on inputs
-        const basePrice = 5000; // Base price per sqft
+        try {
+            // API call to fetch property from MongoDB with exact location and BHK match
+            const response = await axios.get('/api/properties', {
+                params: {
+                    location: location.toLowerCase(),
+                    bhk: parseInt(bhk)
+                }
+            });
 
-        // Location factors (in a real app, these would come from historical data)
-        const locationFactors = {
-            'Whitefield': 1.2,
-            'Electronic City': 1.1,
-            'Indiranagar': 1.8,
-            'Koramangala': 1.7,
-            'HSR Layout': 1.6,
-            'JP Nagar': 1.4,
-            'Marathahalli': 1.3,
-            'Jayanagar': 1.5,
-            'Bannerghatta Road': 1.3,
-        };
+            if (response.data && response.data.length > 0) {
+                // Check for exact match
+                const matchedProperty = response.data.find(
+                    (property) =>
+                        property.location.toLowerCase() === location.toLowerCase() &&
+                        property.bhk === parseInt(bhk)
+                );
 
-        // Calculate price (simple formula for demo purposes)
-        const locationFactor = locationFactors[location] || 1;
-        const price = basePrice * parseFloat(area) * locationFactor * (0.9 + (bhk * 0.15)) * (0.95 + (bath * 0.1));
+                if (matchedProperty) {
+                    // Exact match found
+                    setPropertyFound(matchedProperty);
+                    setPredictedPrice(matchedProperty.price);
+                } else {
+                    // No exact match
+                    setPropertyFound(null);
+                    setPredictedPrice(null);
+                }
+            } else {
+                // No properties found
+                setPropertyFound(null);
+                setPredictedPrice(null);
+            }
+        } catch (error) {
+            console.error('Error fetching property:', error);
+            setPropertyFound(null);
+            setPredictedPrice(null);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-        setPredictedPrice(Math.round(price * 100) / 100);
+    const handleBookAppointment = () => {
+        // Simulate booking appointment (in a real app, this would be an API call)
+        setIsAppointmentBooked(true);
+        // Optionally, send a request to your backend to record the appointment
     };
 
     const menuItems = [
@@ -184,17 +213,50 @@ const Dashboard = () => {
                                 </select>
                             </div>
 
-                            <button type="submit" className="predict-btn">
+                            <button type="submit" className="predict-btn" disabled={isLoading}>
                                 <TbReportAnalytics />
-                                Predict Price
+                                {isLoading ? 'Predicting...' : 'Predict Price'}
                             </button>
                         </form>
 
-                        {predictedPrice && (
+                        {propertyFound && predictedPrice && (
                             <div className="prediction-result">
-                                <h3>Estimated Property Price:</h3>
-                                <p>₹ {predictedPrice.toLocaleString('en-IN')}</p>
-                                <small>*This is an approximate estimation based on the provided details</small>
+                                <h3>Property Found!</h3>
+                                <img
+                                    src={propertyFound.imageUrl || 'https://via.placeholder.com/300x200?text=Property+Image'}
+                                    alt={propertyFound.title}
+                                    className="property-image"
+                                />
+                                <p className="price">
+                                    <FaRupeeSign /> {predictedPrice.toLocaleString('en-IN')}
+                                </p>
+                                <div className="property-details">
+                                    <p><strong>Title:</strong> {propertyFound.title}</p>
+                                    <p><strong>Location:</strong> {propertyFound.location}</p>
+                                    <p><strong>Area:</strong> {propertyFound.area} sq ft</p>
+                                    <p><strong>BHK:</strong> {propertyFound.bhk}</p>
+                                    <p><strong>Bathrooms:</strong> {propertyFound.baths}</p>
+                                </div>
+                                {!isAppointmentBooked ? (
+                                    <button 
+                                        className="buy-btn"
+                                        onClick={handleBookAppointment}
+                                    >
+                                        Buy Property
+                                    </button>
+                                ) : (
+                                    <div className="appointment-booked">
+                                        <FaCheckCircle className="check-icon" />
+                                        <p>Appointment Booked!</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {!propertyFound && !isLoading && predictedPrice === null && location && (
+                            <div className="prediction-result no-property">
+                                <h3>No Properties Available</h3>
+                                <p>Our properties are coming soon in this area!</p>
                             </div>
                         )}
                     </div>

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './Dashboard.css';
-import './PropertyManagement.css';
-import { FaHome, FaChartLine, FaPlus, FaEdit, FaTrash, FaBars, FaTimes, FaImages } from 'react-icons/fa';
+import './PropertyDashboard.css';
+import { FaHome, FaChartLine, FaPlus, FaEdit, FaTrash, FaBars, FaTimes } from 'react-icons/fa';
 import { AiOutlineInfoCircle, AiOutlineContacts } from 'react-icons/ai';
 import { BiLogOut } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const defaultForm = {
   title: '',
@@ -25,19 +25,23 @@ const PropertyDashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
   const [imageError, setImageError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const fileInputRef = useRef();
 
-  // Load from localStorage
+  // Load properties from backend
   useEffect(() => {
-    const stored = localStorage.getItem(LOCAL_KEY);
-    if (stored) setProperties(JSON.parse(stored));
+    const fetchProperties = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/properties');
+        const data = await res.json();
+        setProperties(data);
+      } catch (err) {
+        console.error('Error fetching properties:', err);
+      }
+    };
+    fetchProperties();
   }, []);
-
-  // Save to localStorage
-  useEffect(() => {
-    localStorage.setItem(LOCAL_KEY, JSON.stringify(properties));
-  }, [properties]);
 
   // Handle menu navigation
   const handleMenu = (action) => {
@@ -61,66 +65,77 @@ const PropertyDashboard = () => {
   // Handle image upload
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length < 1 || files.length > 4) {
-      setImageError('Please select between 1 and 4 images.');
+    if (files.length !== 1) {
+      setImageError('Please select exactly one image.');
       return;
     }
     setImageError('');
-    // Read files as base64
-    Promise.all(files.map(file => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (ev) => resolve(ev.target.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    })).then(images => {
-      setForm(prev => ({ ...prev, images }));
-    });
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setForm((prev) => ({ ...prev, images: [ev.target.result] }));
+    };
+    reader.readAsDataURL(files[0]);
   };
 
   // Add or update property
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.title || !form.location || !form.price || !form.area || !form.bhk || !form.baths) return;
-    if (!form.images || form.images.length < 1 || form.images.length > 4) {
-      setImageError('Please select between 1 and 4 images.');
+  
+    if (!form.title || !form.location || !form.price || !form.area || !form.bhk || !form.baths) {
+      setImageError('Please fill all fields.');
       return;
     }
-    setImageError('');
-    if (isEditing) {
-      setProperties((prev) =>
-        prev.map((p) => (p.id === editId ? { ...form, id: editId } : p))
-      );
-      setIsEditing(false);
-      setEditId(null);
-    } else {
-      setProperties((prev) => [
-        ...prev,
-        { ...form, id: Date.now() },
-      ]);
+  
+    if (!form.images || form.images.length !== 1) {
+      setImageError('Please select exactly one image.');
+      return;
     }
-    setForm(defaultForm);
-    if (fileInputRef.current) fileInputRef.current.value = '';
+  
+    const priceInRupees = parseFloat(form.price) * 100000;
+    const propertyData = { ...form, price: priceInRupees };
+  
+    setIsSubmitting(true);
+  
+    try {
+      if (isEditing) {
+        const res = await axios.put(`http://localhost:5000/api/properties/${editId}`, propertyData);
+        setProperties((prev) =>
+          prev.map((p) => (p._id === editId ? res.data : p))
+        );
+        setIsEditing(false);
+        setEditId(null);
+      } else {
+        const res = await axios.post('http://localhost:5000/api/properties', propertyData);
+        setProperties((prev) => [...prev, res.data]);
+      }
+  
+      setForm(defaultForm);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      setImageError('');
+    } catch (err) {
+      console.error('Error saving property:', err);
+      setImageError('Error saving property. Please try again.');
+    }
+  
+    setIsSubmitting(false);
   };
 
   // Edit property
   const handleEdit = (property) => {
-    setForm({ ...property });
+    setForm({ ...property, price: (property.price / 100000).toFixed(2) }); // Convert rupees to lacs
     setIsEditing(true);
-    setEditId(property.id);
+    setEditId(property._id);
     setImageError('');
   };
 
   // Delete property
-  const handleDelete = (id) => {
-    setProperties((prev) => prev.filter((p) => p.id !== id));
-    if (isEditing && editId === id) {
-      setIsEditing(false);
-      setEditId(null);
-      setForm(defaultForm);
-      setImageError('');
-      if (fileInputRef.current) fileInputRef.current.value = '';
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/properties/${id}`);
+      setProperties((prev) => prev.filter((p) => p._id !== id));
+    } catch (err) {
+      console.error('Error deleting property:', err);
+      setImageError('Error deleting property. Please try again.');
     }
   };
 
@@ -146,7 +161,7 @@ const PropertyDashboard = () => {
       <header className="dashboard-header">
         <div className="logo">
           <FaHome className="logo-icon" />
-          <h1>EstateHub Dashboard</h1>
+          <h1>EstateHub</h1>
         </div>
         <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <FaTimes /> : <FaBars />}
@@ -158,7 +173,7 @@ const PropertyDashboard = () => {
         </div>
         <ul className="menu-items">
           {menuItems.map((item, idx) => (
-            <li key={idx} onClick={() => { item.action(); setMenuOpen(false); }} className="menu-item">
+            <li key={idx} onClick={item.action} className="menu-item">
               <span className="menu-icon">{item.icon}</span>
               <span className="menu-text">{item.text}</span>
             </li>
@@ -166,61 +181,118 @@ const PropertyDashboard = () => {
         </ul>
       </nav>
       <main className="dashboard-content">
-        <h2 className="featured-title">Featured Properties</h2>
+        <h2 className="featured-title">Manage Properties</h2>
         <div className="property-form-section">
           <form className="property-form-grid" onSubmit={handleSubmit}>
-            {/* Row 1: Title, Location, Price */}
             <div className="form-row-grid">
-              <input name="title" value={form.title} onChange={handleChange} placeholder="title" required />
-              <input name="location" value={form.location} onChange={handleChange} placeholder="location" required />
-              <input name="price" value={form.price} onChange={handleChange} placeholder="Price" type="number" required />
+              <div className="form-group">
+                <label htmlFor="title">Title</label>
+                <input
+                  id="title"
+                  name="title"
+                  value={form.title}
+                  onChange={handleChange}
+                  placeholder="Enter property title"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="location">Location</label>
+                <input
+                  id="location"
+                  name="location"
+                  value={form.location}
+                  onChange={handleChange}
+                  placeholder="Enter location"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="price">Price (Lacs)</label>
+                <input
+                  id="price"
+                  name="price"
+                  value={form.price}
+                  onChange={handleChange}
+                  placeholder="Enter price in lacs"
+                  type="number"
+                  step="0.01"
+                  required
+                />
+              </div>
             </div>
-            {/* Row 2: Area, Beds, Bath */}
             <div className="form-row-grid">
-              <input name="area" value={form.area} onChange={handleChange} placeholder="area(sq.ft)" type="number" required />
-              <input name="bhk" value={form.bhk} onChange={handleChange} placeholder="Beds" type="number" required />
-              <input name="baths" value={form.baths} onChange={handleChange} placeholder="Bath" type="number" required />
+              <div className="form-group">
+                <label htmlFor="area">Area (sq.ft)</label>
+                <input
+                  id="area"
+                  name="area"
+                  value={form.area}
+                  onChange={handleChange}
+                  placeholder="Enter area"
+                  type="number"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="bhk">Beds (BHK)</label>
+                <input
+                  id="bhk"
+                  name="bhk"
+                  value={form.bhk}
+                  onChange={handleChange}
+                  placeholder="Enter BHK"
+                  type="number"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="baths">Baths</label>
+                <input
+                  id="baths"
+                  name="baths"
+                  value={form.baths}
+                  onChange={handleChange}
+                  placeholder="Enter baths"
+                  type="number"
+                  required
+                />
+              </div>
             </div>
-            {/* Row 3: Choose image */}
-            <div className="form-row-grid" style={{ justifyContent: 'center' }}>
+            <div className="form-row-grid form-row-center">
               <label className="choose-image-label">
-                Choose image
+                Upload Image
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={e => {
-                    const files = Array.from(e.target.files);
-                    if (files.length !== 1) {
-                      setImageError('Please select only one image.');
-                      setForm(prev => ({ ...prev, images: [] }));
-                      return;
-                    }
-                    setImageError('');
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                      setForm(prev => ({ ...prev, images: [ev.target.result] }));
-                    };
-                    reader.readAsDataURL(files[0]);
-                  }}
+                  onChange={handleImageChange}
                   ref={fileInputRef}
                 />
               </label>
               {imageError && <div className="image-error">{imageError}</div>}
               <div className="image-preview-row">
-                {form.images && form.images[0] && (
-                  <div>
+                {form.images[0] && (
+                  <div className="image-preview">
                     <img src={form.images[0]} alt="preview" />
                   </div>
                 )}
               </div>
             </div>
-            {/* Row 4: Add Property Button */}
-            <div className="form-row-grid" style={{ justifyContent: 'center' }}>
-              <button type="submit" className="add-btn">
-                {isEditing ? <FaEdit /> : <FaPlus />} {isEditing ? 'Update' : 'Add'} Property
+            <div className="form-row-grid form-row-center">
+              <button
+                type="submit"
+                className="add-btn"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Processing...' : isEditing ? <><FaEdit /> Update Property</> : <><FaPlus /> Add Property</>}
               </button>
               {isEditing && (
-                <button type="button" className="cancel-btn" onClick={handleCancel}>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={handleCancel}
+                  disabled={isSubmitting}
+                >
                   Cancel
                 </button>
               )}
@@ -228,33 +300,43 @@ const PropertyDashboard = () => {
           </form>
         </div>
         <div className="property-listings-section">
-          <h3 className="property-listings-title">Property Listings</h3>
+          <h3 className="property-listings-title">Your Properties</h3>
           <div className="property-grid">
             {properties.length === 0 ? (
-              <p style={{ textAlign: 'center', width: '100%' }}>No properties added yet.</p>
+              <p className="no-properties">No properties added yet.</p>
             ) : (
               properties.map((property) => (
-                <div className="property-card static-card" key={property.id}>
-                  <div className="property-image-wrapper property-card-image-wrapper" style={{ gap: 18, minHeight: 120, flexWrap: 'wrap', justifyContent: 'flex-start' }}>
-                    {property.images && property.images[0] && (
-                      <div>
-                        <img src={property.images[0]} alt="property-img" />
-                      </div>
+                <div className="property-card" key={property._id}>
+                  <div className="property-image-wrapper">
+                    {property.images[0] && (
+                      <img src={property.images[0]} alt={property.title} />
                     )}
                   </div>
                   <div className="property-info">
-                    <div className="property-title">{property.title}</div>
-                    <div className="property-location">{property.location}</div>
+                    <h3 className="property-title">{property.title}</h3>
+                    <p className="property-location">{property.location}</p>
                     <div className="property-details">
-                      <span>₹{property.price}</span> | <span>{property.area} sq.ft</span>
+                      <span>₹{(property.price / 100000).toFixed(2)} Lacs</span>
+                      <span>{property.area} sq.ft</span>
                     </div>
                     <div className="property-details">
-                      <span>{property.bhk} BHK</span> | <span>{property.baths} Baths</span>
+                      <span>{property.bhk} BHK</span>
+                      <span>{property.baths} Baths</span>
                     </div>
                   </div>
                   <div className="property-actions">
-                    <button className="edit-btn animated-btn" onClick={() => handleEdit(property)}><FaEdit /> Edit</button>
-                    <button className="delete-btn animated-btn" onClick={() => handleDelete(property.id)}><FaTrash /> Delete</button>
+                    <button
+                      className="edit-btn"
+                      onClick={() => handleEdit(property)}
+                    >
+                      <FaEdit /> Edit
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDelete(property._id)}
+                    >
+                      <FaTrash /> Delete
+                    </button>
                   </div>
                 </div>
               ))
@@ -266,4 +348,4 @@ const PropertyDashboard = () => {
   );
 };
 
-export default PropertyDashboard; 
+export default PropertyDashboard;

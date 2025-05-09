@@ -10,6 +10,7 @@ import ContactPage from "./ContactPage";
 import AboutPage from "./AboutPage";
 import HomePage from "./HomePage";
 import PropertyDashboard from "./PropertyDashboard";
+import DealerLogin from "./DealerLogin";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -18,11 +19,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/Dashboard" element={<Dashboard />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/home" element={<HomePage />} />
-        <Route path="/property-dashboard" element={<PropertyDashboard />} />
+        <Route path="/PropertyDashboard" element={<PropertyDashboard />} />
+        <Route path="/DealerLogin" element={<DealerLogin />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

@@ -1,4 +1,3 @@
-/* Dashboard.css */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
@@ -9,6 +8,7 @@
     --menu-bg: #1a237e;
     --menu-hover: #283593;
     --menu-text: #fff;
+    --success-color: #2ecc71;
 }
 
 * {
@@ -299,6 +299,12 @@ body {
     background: linear-gradient(135deg, #2a5298, #4ECDC4);
 }
 
+.predict-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .prediction-result {
     margin-top: 2rem;
     padding: 2rem;
@@ -327,15 +333,77 @@ body {
     text-shadow: 0 2px 4px rgba(42, 82, 152, 0.2);
 }
 
-.prediction-result small {
-    color: #64748b;
-    font-size: 0.9rem;
-    display: block;
-    margin-top: 1rem;
-    font-style: italic;
+.prediction-result.no-property h3 {
+    color: #e74c3c;
 }
 
-/* Feature cards styling update */
+.prediction-result.no-property p {
+    font-size: 1.2rem;
+    background: none;
+    -webkit-text-fill-color: #666;
+    text-shadow: none;
+}
+
+.property-details {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+}
+
+.property-details p {
+    font-size: 1rem;
+    background: none;
+    -webkit-text-fill-color: #333;
+    text-shadow: none;
+    margin-bottom: 0.5rem;
+}
+
+.buy-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+}
+
+.buy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+}
+
+.appointment-booked {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(46, 204, 113, 0.1);
+    border-radius: 8px;
+}
+
+.appointment-booked .check-icon {
+    font-size: 1.5rem;
+    color: var(--success-color);
+}
+
+.appointment-booked p {
+    font-size: 1.1rem;
+    background: none;
+    -webkit-text-fill-color: var(--success-color);
+    text-shadow: none;
+}
+
 .feature-icon {
     font-size: 2.8rem;
     margin-bottom: 1.5rem;
@@ -367,7 +435,6 @@ body {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive styles */
 @media (max-width: 768px) {
     .side-menu {
         width: 100%;
@@ -405,7 +472,6 @@ body {
     }
 }
 
-/* Animations */
 @keyframes pulse {
     0% {
         transform: scale(1);
@@ -434,7 +500,8 @@ body {
     animation: shake 0.5s ease;
 }
 
-.predict-btn:active {
+.predict-btn:active,
+.buy-btn:active {
     animation: pulse 0.3s ease;
 }
 
@@ -537,7 +604,7 @@ body {
 @keyframes float {
     0%, 100% {
         transform: translateY(0);
-}
+    }
     50% {
         transform: translateY(-10px);
     }
@@ -545,7 +612,7 @@ body {
 
 .feature-card {
     animation: float 5s infinite ease-in-out;
-    }
+}
 
 .feature-card:nth-child(2) {
     animation-delay: 0.2s;
@@ -553,4 +620,15 @@ body {
 
 .feature-card:nth-child(3) {
     animation-delay: 0.4s;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
