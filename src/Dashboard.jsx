@@ -23,8 +23,9 @@ const Dashboard = () => {
     const [propertyFound, setPropertyFound] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isAppointmentBooked, setIsAppointmentBooked] = useState(false);
+    const [suggestedLocations, setSuggestedLocations] = useState([]);
 
-    // Popular locations in Bangalore, including Frezer Town
+    // Popular locations in Bangalore
     const popularLocations = [
         'Whitefield', 'Electronic City', 'Indiranagar',
         'Koramangala', 'HSR Layout', 'JP Nagar',
@@ -41,6 +42,28 @@ const Dashboard = () => {
             setUser(JSON.parse(currentUser));
         }
     }, [navigate]);
+
+    // Handle location input changes
+    const handleLocationChange = (e) => {
+        const value = e.target.value;
+        setLocation(value);
+        
+        // Filter locations based on input
+        if (value) {
+            const filtered = popularLocations.filter(loc => 
+                loc.toLowerCase().includes(value.toLowerCase())
+            );
+            setSuggestedLocations(filtered);
+        } else {
+            setSuggestedLocations([]);
+        }
+    };
+
+    // Handle location selection from suggestions
+    const handleLocationSelect = (selectedLocation) => {
+        setLocation(selectedLocation);
+        setSuggestedLocations([]);
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('currentUser');
@@ -65,7 +88,7 @@ const Dashboard = () => {
             });
 
             if (response.data && response.data.length > 0) {
-                // Check for exact match
+                // Find exact match for both location and BHK
                 const matchedProperty = response.data.find(
                     (property) =>
                         property.location.toLowerCase() === location.toLowerCase() &&
@@ -77,7 +100,7 @@ const Dashboard = () => {
                     setPropertyFound(matchedProperty);
                     setPredictedPrice(matchedProperty.price);
                 } else {
-                    // No exact match
+                    // No exact match found
                     setPropertyFound(null);
                     setPredictedPrice(null);
                 }
@@ -96,9 +119,7 @@ const Dashboard = () => {
     };
 
     const handleBookAppointment = () => {
-        // Simulate booking appointment (in a real app, this would be an API call)
         setIsAppointmentBooked(true);
-        // Optionally, send a request to your backend to record the appointment
     };
 
     const menuItems = [
@@ -110,7 +131,7 @@ const Dashboard = () => {
     ];
 
     if (!user) {
-        return null; // or a loading spinner
+        return null;
     }
 
     return (
@@ -198,19 +219,32 @@ const Dashboard = () => {
                                 </div>
                             </div>
 
-                            <div className="form-group">
+                            <div className="form-group location-group">
                                 <label htmlFor="location">Location</label>
-                                <select
+                                <div className="location-input-container">
+                                    <input
+                                        type="text"
                                     id="location"
                                     value={location}
-                                    onChange={(e) => setLocation(e.target.value)}
+                                        onChange={handleLocationChange}
+                                        placeholder="Type location..."
                                     required
-                                >
-                                    <option value="">Select location</option>
-                                    {popularLocations.map((loc) => (
-                                        <option key={loc} value={loc}>{loc}</option>
+                                    />
+                                    {suggestedLocations.length > 0 && (
+                                        <div className="location-suggestions">
+                                            {suggestedLocations.map((loc) => (
+                                                <div
+                                                    key={loc}
+                                                    className="suggestion-item"
+                                                    onClick={() => handleLocationSelect(loc)}
+                                                >
+                                                    <FaMapMarkerAlt />
+                                                    {loc}
+                                                </div>
                                     ))}
-                                </select>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             <button type="submit" className="predict-btn" disabled={isLoading}>
@@ -219,14 +253,26 @@ const Dashboard = () => {
                             </button>
                         </form>
 
-                        {propertyFound && predictedPrice && (
+                        {isLoading ? (
+                            <div className="prediction-result loading">
+                                <p>Searching for properties...</p>
+                            </div>
+                        ) : propertyFound && predictedPrice ? (
                             <div className="prediction-result">
                                 <h3>Property Found!</h3>
+                                <div className="property-image-container">
                                 <img
-                                    src={propertyFound.imageUrl || 'https://via.placeholder.com/300x200?text=Property+Image'}
+                                        src={propertyFound.images && propertyFound.images[0] 
+                                            ? propertyFound.images[0] 
+                                            : 'https://via.placeholder.com/300x200?text=Property+Image'}
                                     alt={propertyFound.title}
                                     className="property-image"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = 'https://via.placeholder.com/300x200?text=Property+Image';
+                                        }}
                                 />
+                                </div>
                                 <p className="price">
                                     <FaRupeeSign /> {predictedPrice.toLocaleString('en-IN')}
                                 </p>
@@ -237,26 +283,21 @@ const Dashboard = () => {
                                     <p><strong>BHK:</strong> {propertyFound.bhk}</p>
                                     <p><strong>Bathrooms:</strong> {propertyFound.baths}</p>
                                 </div>
-                                {!isAppointmentBooked ? (
+                                <div className="contact-section">
+                                    <p>If you want to buy, contact here.</p>
                                     <button 
-                                        className="buy-btn"
-                                        onClick={handleBookAppointment}
+                                        className="contact-btn"
+                                        onClick={() => navigate('/contact')}
                                     >
-                                        Buy Property
+                                        Contact
                                     </button>
-                                ) : (
-                                    <div className="appointment-booked">
-                                        <FaCheckCircle className="check-icon" />
-                                        <p>Appointment Booked!</p>
                                     </div>
-                                )}
                             </div>
-                        )}
-
-                        {!propertyFound && !isLoading && predictedPrice === null && location && (
+                        ) : location && !isLoading && (
                             <div className="prediction-result no-property">
-                                <h3>No Properties Available</h3>
-                                <p>Our properties are coming soon in this area!</p>
+                                <h3>No Properties Found</h3>
+                                <p>Sorry, there are no properties available in {location} with {bhk} BHK configuration.</p>
+                                <p className="suggestion-text">Please try searching with different location or BHK configuration.</p>
                             </div>
                         )}
                     </div>
